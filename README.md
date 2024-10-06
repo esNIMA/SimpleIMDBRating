@@ -10,7 +10,7 @@ This API allows users to sign up, log in, rate movies, and provide feedback. Eac
 
 ### 1. User Authentication
 
-#### POST /signin/
+#### POST users/signin/
 **Description**: Registers a new user.
 
 - **Request**:
@@ -39,7 +39,7 @@ This API allows users to sign up, log in, rate movies, and provide feedback. Eac
 
 ---
 
-#### POST /login/
+#### POST users/login/
 **Description**: Authenticates a user and returns a token for future authenticated requests.
 
 - **Request**:
