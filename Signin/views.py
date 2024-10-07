@@ -6,7 +6,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.authtoken.models import Token
-
+import re
 
 # Serializer
 class SigninSerializer(serializers.Serializer):
@@ -27,6 +27,21 @@ class SigninSerializer(serializers.Serializer):
         if User.objects.filter(email=data['email']).exists():
             raise serializers.ValidationError({"email": "This email is already registered."})
 
+        ## IMPORTANT!
+        #Password validation is commented for the sake of easy testing
+
+        # # Validate password length (at least 8 characters)
+        # if len(data['password']) < 8:
+        #     raise serializers.ValidationError({"password": "Password must be at least 8 characters long."})
+        #
+        # # Validate password for at least one capital letter
+        # if not re.search(r'[A-Z]', data['password']):
+        #     raise serializers.ValidationError({"password": "Password must contain at least one capital letter."})
+        #
+        # # Validate password for at least one number
+        # if not re.search(r'[0-9]', data['password']):
+        #     raise serializers.ValidationError({"password": "Password must contain at least one number."})
+
         return data
 
     # Create a user after validation
@@ -34,6 +49,7 @@ class SigninSerializer(serializers.Serializer):
         validated_data.pop('password_confirm')
         validated_data['password'] = make_password(validated_data['password'])
         return User.objects.create(**validated_data)
+
 
 
 # Signin API
@@ -64,10 +80,9 @@ class LoginView(APIView):
         if not username or not password:
             return Response({'error': 'Username and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Manually authenticate the user
         try:
             user = User.objects.get(username=username)
-            if check_password(password, user.password):  # Validate password manually
+            if check_password(password, user.password):
                 token, created = Token.objects.get_or_create(user=user)
                 return Response({
                     'token': token.key,
